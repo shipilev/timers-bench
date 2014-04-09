@@ -1,0 +1,63 @@
+This project measures timer latency (average time spent on timer call)
+and granularity (average time in for which timer value stays the same)
+of System.nanoTime() and System.currentTimeMillis() in a few modes.
+This gives the estimates on the timer precision used for performance
+assessment. I could do this experiment internally, but figured other
+guys would find this data useful as well.
+
+Build it from source:
+  $ mvn clean install
+
+Run it:
+  $ java -jar target/timerbench.jar
+
+Please cut and paste the output and send it back to me at
+aleksey@shipilev.net. Thanks!
+
+Sample output:
+
+---- 8< (cut here) -----------------------------------------
+Java(TM) SE Runtime Environment, 1.8.0-b132
+Java HotSpot(TM) 64-Bit Server VM, 25.0-b70
+Linux, 3.13.0-custom+, amd64
+
+Burning up to figure out the exact CPU count....... done!
+
+Running with 1 threads and [-client]:
+       granularity_currentTime:  989264.177 +-   1769.248 ns
+          granularity_nanotime:      35.077 +-      0.131 ns
+           latency_currentTime:      42.370 +-      2.374 ns
+              latency_nanotime:      35.430 +-      0.107 ns
+
+Running with 2 threads and [-client]:
+       granularity_currentTime:  993246.791 +-   1523.273 ns
+          granularity_nanotime:      49.965 +-      3.673 ns
+           latency_currentTime:      51.368 +-      3.529 ns
+              latency_nanotime:      42.261 +-      4.616 ns
+
+Running with 4 threads and [-client]:
+       granularity_currentTime: 1005131.127 +-   6633.599 ns
+          granularity_nanotime:      56.744 +-      2.014 ns
+           latency_currentTime:      59.416 +-      2.466 ns
+              latency_nanotime:      54.162 +-      1.247 ns
+
+Running with 1 threads and [-server]:
+       granularity_currentTime:  989051.057 +-   1759.073 ns
+          granularity_nanotime:      35.422 +-      0.488 ns
+           latency_currentTime:      40.839 +-      0.103 ns
+              latency_nanotime:      35.457 +-      0.340 ns
+
+Running with 2 threads and [-server]:
+       granularity_currentTime:  993251.781 +-    899.136 ns
+          granularity_nanotime:      45.761 +-      4.810 ns
+           latency_currentTime:      48.669 +-      4.069 ns
+              latency_nanotime:      40.424 +-      4.293 ns
+
+Running with 4 threads and [-server]:
+       granularity_currentTime: 1000651.038 +-   4507.238 ns
+          granularity_nanotime:      55.954 +-      1.864 ns
+           latency_currentTime:      59.752 +-      1.937 ns
+              latency_nanotime:      54.484 +-      4.416 ns
+
+---- 8< (cut here) -----------------------------------------
+
