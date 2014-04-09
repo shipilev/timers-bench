@@ -1,0 +1,6 @@
+# maven pollution
+target/*
+
+# intellij pollution
+.idea/*
+*.iml
