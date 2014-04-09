@@ -6,7 +6,7 @@ assessment. I could do this experiment internally, but figured other
 guys would find this data useful as well.
 
 Build it from source:
-  $ mvn clean install
+  $ mvn clean package
 
 Run it:
   $ java -jar target/timerbench.jar
