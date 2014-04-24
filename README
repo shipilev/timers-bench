@@ -11,9 +11,6 @@ Build it from source:
 Run it:
   $ java -jar target/timerbench.jar
 
-PLEASE cut and paste the output and SEND IT BACK TO ME at
-aleksey@shipilev.net. Thanks!
-
 Sample output:
 
 ---- 8< (cut here) -----------------------------------------
