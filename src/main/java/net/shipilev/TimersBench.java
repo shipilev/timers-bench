@@ -1,16 +1,15 @@
 package net.shipilev;
 
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.logic.results.RunResult;
-import org.openjdk.jmh.runner.BenchmarkRecord;
+import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -20,12 +19,14 @@ import org.openjdk.jmh.runner.options.VerboseMode;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.requireNonNull;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -37,17 +38,17 @@ public class TimersBench {
 
     private long lastValue;
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public long latency_nanotime() {
         return System.nanoTime();
     }
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public long latency_currentTime() {
         return System.currentTimeMillis();
     }
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public long granularity_nanotime() {
         long cur;
         do {
@@ -57,7 +58,7 @@ public class TimersBench {
         return cur;
     }
 
-    @GenerateMicroBenchmark
+    @Benchmark
     public long granularity_currentTime() {
         long cur;
         do {
@@ -98,20 +99,24 @@ public class TimersBench {
         pw.println("Running with " + threads + " threads and " + Arrays.toString(jvmOpts) + ": ");
 
         Options opts = new OptionsBuilder()
-                .threads(threads)
-                .verbosity(VerboseMode.SILENT)
-                .jvmArgs(jvmOpts)
-                .build();
+                           .threads(threads)
+                           .verbosity(VerboseMode.SILENT)
+                           .jvmArgs(jvmOpts)
+                           .build();
 
-        SortedMap<BenchmarkRecord,RunResult> results = new Runner(opts).run();
-        for (RunResult r : results.values()) {
-            String name = r.getBenchmark().getUsername().substring(r.getBenchmark().getUsername().lastIndexOf(".") + 1);
+        Collection<RunResult> results = new Runner(opts).run();
+        for (RunResult r : results) {
+            String name = simpleName(r.getParams().getBenchmark());
             double score = r.getPrimaryResult().getScore();
             double scoreError = r.getPrimaryResult().getStatistics().getMeanErrorAt(0.99);
-            pw.printf("%30s: %11.3f +- %10.3f ns%n", name, score, scoreError);
+            pw.printf("%30s: %11.3f ± %10.3f ns%n", name, score, scoreError);
         }
     }
 
+    private static String simpleName(String qName) {
+        int lastDot = requireNonNull(qName).lastIndexOf('.');
+        return lastDot < 0 ? qName : qName.substring(lastDot + 1);
+    }
 
     /**
      * Warm up the CPU schedulers, bring all the CPUs online to get the
@@ -129,7 +134,7 @@ public class TimersBench {
         int warmupTime = 1000;
         long lastChange = System.currentTimeMillis();
 
-        List<Future<?>> futures = new ArrayList<Future<?>>();
+        List<Future<?>> futures = new ArrayList<>();
         futures.add(service.submit(new BurningTask()));
 
         pw.print(".");
